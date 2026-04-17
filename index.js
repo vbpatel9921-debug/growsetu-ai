@@ -1,34 +1,39 @@
 const express = require("express");
+const axios = require("axios");
+
 const app = express();
+app.use(express.json());
 
-// UI Page
-app.get("/", (req, res) => {
-  res.send(`
-    <h2>🤖 Growsetu AI Employee</h2>
-    <input id="msg" placeholder="Command लिखो..." />
-    <button onclick="run()">Run</button>
-    <p id="result"></p>
+const TOKEN = "YOUR_TOKEN_HERE";
+const BASE_URL = "https://growsetu.in/api";
+const VENDOR_UID = "YOUR_VENDOR_UID";
 
-    <script>
-      async function run() {
-        const message = document.getElementById("msg").value;
+app.post("/run", async (req, res) => {
+  try {
+    const { phone, message } = req.body;
 
-        let res = await fetch("/run");
-        let data = await res.json();
-
-        document.getElementById("result").innerText = data.status;
+    const response = await axios.post(
+      `${BASE_URL}/send-message`,
+      {
+        phone_number: phone,
+        message: message
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`
+        }
       }
-    </script>
-  `);
+    );
+
+    res.json({
+      status: "✅ Message Sent",
+      data: response.data
+    });
+
+  } catch (err) {
+    console.error(err.message);
+    res.json({ status: "❌ Error", error: err.message });
+  }
 });
 
-// API Route
-app.get("/run", (req, res) => {
-  res.json({
-    status: "✅ Command received (next step automation)"
-  });
-});
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Server started");
-});
+app.listen(3000, () => console.log("Server running"));
