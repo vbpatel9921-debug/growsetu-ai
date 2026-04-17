@@ -1,46 +1,40 @@
-const express = require("express");
-const axios = require("axios");
-
-const app = express();
-app.use(express.json());
-
-// =======================
-// TEST ROUTE
-// =======================
-app.get("/", (req, res) => {
-  res.send("🚀 Growsetu AI Employee Running");
-});
-
-// =======================
-// WEBHOOK GET (browser test)
-// =======================
-app.get("/webhook", (req, res) => {
-  res.send("✅ Webhook is live");
-});
-
-// =======================
-// WEBHOOK POST (Growsetu / WhatsApp)
-// =======================
 app.post("/webhook", async (req, res) => {
   try {
     console.log("📩 Webhook Data:", JSON.stringify(req.body));
 
-    // Example: phone + message निकालना
-    const phone = req.body.phone || "919XXXXXXXXX";
-    const message = req.body.message || "Hello from AI 🚀";
+    const phone = req.body.contact?.phone_number;
+    const message = req.body.body || "no message";
+
+    let reply = "";
 
     // =======================
-    // SEND MESSAGE TO GROWSETU API
+    // AI COMMAND LOGIC
+    // =======================
+    if (message.toLowerCase().includes("hi")) {
+      reply = "👋 Hello! Main Growsetu AI Employee hoon 🚀";
+    } 
+    else if (message.toLowerCase().includes("data")) {
+      reply = "📊 Data extraction start ho gaya hai...";
+    }
+    else if (message.toLowerCase().includes("map")) {
+      reply = "🗺 Google Maps se data nikal raha hoon...";
+    }
+    else {
+      reply = "🤖 Command samajh nahi aaya, phir se try karo";
+    }
+
+    // =======================
+    // SEND MESSAGE BACK
     // =======================
     const API_URL = "https://growsetu.in/api";
-    const TOKEN = "r3qZxcSLrVxfzo6vSg8lSEvBpKSvlmdx3pUmtE5Lo7vOfXOjJR6OSylKcCO0akEm";   // 👈 यहाँ अपना token डालना
-    const VENDOR_UID = "11b5051f-4dd9-4f4b-ba23-7c88a69ff946"; // 👈 यहाँ UID डालना
+    const TOKEN = "r3qZxcSLrVxfzo6vSg8lSEvBpKSvlmdx3pUmtE5Lo7vOfXOjJR6OSylKcCO0akEm";
+    const VENDOR_UID = "11b5051f-4dd9-4f4b-ba23-7c88a69ff946";
 
-    const response = await axios.post(
+    await axios.post(
       API_URL,
       {
         phone_number: phone,
-        message: message
+        message: reply
       },
       {
         headers: {
@@ -52,46 +46,12 @@ app.post("/webhook", async (req, res) => {
       }
     );
 
-    console.log("✅ Message Sent:", response.data);
+    console.log("✅ Reply Sent:", reply);
 
-    res.json({
-      status: "success",
-      message: "Message sent from AI Employee 🚀"
-    });
+    res.sendStatus(200);
 
   } catch (error) {
     console.error("❌ Error:", error.message);
-
-    res.status(500).json({
-      status: "error",
-      message: error.message
-    });
+    res.sendStatus(500);
   }
-});
-
-// =======================
-// MANUAL RUN API (UI से call)
-// =======================
-app.post("/run", async (req, res) => {
-  try {
-    const { phone, message } = req.body;
-
-    console.log("👉 Manual Run:", phone, message);
-
-    res.json({
-      status: "✅ Command received (next step automation)"
-    });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// =======================
-// SERVER START
-// =======================
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`🔥 Server running on port ${PORT}`);
 });
