@@ -1,44 +1,62 @@
 const express = require("express");
 const axios = require("axios");
 
-const app = express();   // ✅ ये missing था (main error)
+const app = express();
 app.use(express.json());
 
 // =======================
 // TEST ROUTE
 // =======================
 app.get("/", (req, res) => {
-  res.send("🚀 Growsetu AI Running");
+  res.send("🚀 Growsetu AI Employee Running");
 });
 
 // =======================
-// WEBHOOK
+// WEBHOOK (MAIN AI LOGIC)
 // =======================
 app.post("/webhook", async (req, res) => {
   try {
-    console.log("📩 Webhook Data:", JSON.stringify(req.body));
+    console.log("📩 Full Webhook Data:", JSON.stringify(req.body));
 
+    // =======================
+    // EXTRACT PHONE
+    // =======================
     const phone = req.body.contact?.phone_number;
-    const message = req.body.body || "no message";
 
+    // =======================
+    // EXTRACT MESSAGE (IMPORTANT FIX)
+    // =======================
+    const message =
+      req.body?.whatsapp_webhook_payload?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body
+      || "no message";
+
+    console.log("📩 Message:", message);
+
+    // =======================
+    // AI COMMAND SYSTEM
+    // =======================
     let reply = "";
 
     if (message.toLowerCase().includes("hi")) {
-      reply = "👋 Hello! Main AI Employee hoon 🚀";
+      reply = "👋 Hello! Main Growsetu AI Employee hoon 🚀";
     } 
     else if (message.toLowerCase().includes("map")) {
-      reply = "🗺 Google Maps data nikal raha hoon...";
-    } 
+      reply = "🗺 Google Maps se data nikal raha hoon...";
+    }
+    else if (message.toLowerCase().includes("data")) {
+      reply = "📊 Data process ho raha hai...";
+    }
     else {
       reply = "🤖 Command samajh nahi aaya";
     }
 
     // =======================
-    // SEND MESSAGE
+    // SEND MESSAGE BACK (Growsetu API)
     // =======================
-    const API_URL = "https://growsetu.in/api";
-    const TOKEN = "TCRQcpIo8Ii9me5rFt8xJBgwyf7SqeQxGz79VjrgxWwmDBtuvoZ7YY9GmxzPzLdu";
-    const VENDOR_UID = "11b5051f-4dd9-4f4b-ba23-7c88a69ff946";
+    const API_URL = "https://growsetu.in/api/send-message";
+
+    const TOKEN = "PUT_YOUR_TOKEN_HERE";        // 👈 यहाँ अपना token डालो
+    const VENDOR_UID = "PUT_YOUR_UID_HERE";     // 👈 यहाँ UID डालो
 
     await axios.post(
       API_URL,
