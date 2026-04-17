@@ -1,17 +1,35 @@
 const express = require("express");
 const app = express();
 
+// 🔥 UI Page
 app.get("/", (req, res) => {
-  res.send("🚀 Growsetu AI Server Running");
+  res.send(`
+    <h2>🤖 Growsetu AI Employee</h2>
+    <input id="msg" placeholder="Command लिखो..." />
+    <button onclick="run()">Run</button>
+    <p id="result"></p>
+
+    <script>
+      async function run() {
+        const message = document.getElementById("msg").value;
+
+        let res = await fetch("/run");
+        let data = await res.json();
+
+        document.getElementById("result").innerText = data.status;
+      }
+    </script>
+  `);
 });
 
-// 👉 👇 यही जगह है (GET के नीचे, listen के ऊपर)
-app.post("/run", async (req, res) => {
-  return res.json({
-    status: "✅ Growsetu automation ready (next step)"
+// 🔥 API Route
+app.get("/run", (req, res) => {
+  res.json({
+    status: "✅ Growsetu automation ready"
   });
 });
 
+// 🚀 Server Start
 app.listen(process.env.PORT || 3000, () => {
   console.log("Server started");
 });
