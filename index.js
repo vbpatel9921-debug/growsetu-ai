@@ -4,36 +4,62 @@ const axios = require("axios");
 const app = express();
 app.use(express.json());
 
-const TOKEN = "YOUR_TOKEN_HERE";
+// 🔐 Growsetu config
+const TOKEN = "r3qZxcSLrVxfzo6vSg8lSEvBpKSvlmdx3pUmtE5Lo7vOfXOjJR6OSylKcCO0akEm";
 const BASE_URL = "https://growsetu.in/api";
-const VENDOR_UID = "YOUR_VENDOR_UID";
+const VENDOR_UID = "11b5051f-4dd9-4f4b-ba23-7c88a69ff946";
 
-app.post("/run", async (req, res) => {
+// ===== Webhook =====
+app.post("/webhook", async (req, res) => {
   try {
-    const { phone, message } = req.body;
+    console.log("Incoming:", req.body);
 
-    const response = await axios.post(
-      `${BASE_URL}/send-message`,
-      {
-        phone_number: phone,
-        message: message
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${TOKEN}`
+    const phone = req.body?.contact?.phone_number;
+    const message = req.body?.message?.body || "";
+
+    console.log("Phone:", phone);
+    console.log("Message:", message);
+
+    let reply = "❌ Command समझ नहीं आया";
+
+    if (message.toLowerCase().includes("hello")) {
+      reply = "👋 Hello AI Employee ready";
+    }
+
+    if (message.toLowerCase().includes("campaign")) {
+      reply = "🚀 Campaign start कर रहा हूँ";
+    }
+
+    if (message.toLowerCase().includes("data")) {
+      reply = "📊 Data निकाल रहा हूँ";
+    }
+
+    // ===== Send message via Growsetu API =====
+    if (phone) {
+      await axios.post(
+        `${BASE_URL}/${VENDOR_UID}/contact/send-message?token=${TOKEN}`,
+        {
+          phone_number: phone,
+          template_name: "hello_world",   // 👈 अपना template डालना
+          template_language: "en",
+          field_1: "Hello from AI 🚀"
         }
-      }
-    );
+      );
+    }
 
-    res.json({
-      status: "✅ Message Sent",
-      data: response.data
-    });
+    res.sendStatus(200);
 
   } catch (err) {
     console.error(err.message);
-    res.json({ status: "❌ Error", error: err.message });
+    res.sendStatus(500);
   }
 });
 
-app.listen(3000, () => console.log("Server running"));
+// ===== Test =====
+app.get("/", (req, res) => {
+  res.send("🚀 AI Employee Running");
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server started");
+});
