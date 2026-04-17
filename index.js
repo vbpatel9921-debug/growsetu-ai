@@ -55,8 +55,8 @@ app.post("/webhook", async (req, res) => {
     // =======================
     const API_URL = "https://growsetu.in/api/send-message";
 
-    const TOKEN = "PUT_YOUR_TOKEN_HERE";        // 👈 यहाँ अपना token डालो
-    const VENDOR_UID = "PUT_YOUR_UID_HERE";     // 👈 यहाँ UID डालो
+    const TOKEN = "TCRQcpIo8Ii9me5rFt8xJBgwyf7SqeQxGz79VjrgxWwmDBtuvoZ7YY9GmxzPzLdu";        // 👈 यहाँ अपना token डालो
+    const VENDOR_UID = "11b5051f-4dd9-4f4b-ba23-7c88a69ff946";     // 👈 यहाँ UID डालो
 
     await axios.post(
       API_URL,
