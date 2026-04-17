@@ -53,7 +53,7 @@ app.post("/webhook", async (req, res) => {
     // =======================
     // SEND MESSAGE BACK (Growsetu API)
     // =======================
-    const API_URL = "https://growsetu.in/api/send-message";
+    const API_URL = "https://growsetu.in/api";
 
     const TOKEN = "TCRQcpIo8Ii9me5rFt8xJBgwyf7SqeQxGz79VjrgxWwmDBtuvoZ7YY9GmxzPzLdu";        // 👈 यहाँ अपना token डालो
     const VENDOR_UID = "11b5051f-4dd9-4f4b-ba23-7c88a69ff946";     // 👈 यहाँ UID डालो
